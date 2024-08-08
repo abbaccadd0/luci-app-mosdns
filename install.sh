@@ -30,8 +30,8 @@ fi
 CHECK() (
 	echo -e "\r\n${GREEN_COLOR}Checking available space  ...${RES}"
 	ROOT_SPACE=$(df -m /usr | awk 'END{print $4}')
-	if [ $ROOT_SPACE -lt 40 ]; then
-		echo -e "\r\n${RED_COLOR}Error, The system storage space is less than 40MB.${RES}"
+	if [ $ROOT_SPACE -lt 5 ]; then
+		echo -e "\r\n${RED_COLOR}Error, The system storage space is less than 5MB.${RES}"
 		exit 1;
 	fi
 	echo -e "\r\n${GREEN_COLOR}Checking platform  ...${RES}\r\n"
@@ -50,8 +50,8 @@ CHECK() (
 DOWNLOAD() (
 	echo -e "\r\n${GREEN_COLOR}Download Packages ...${RES}\r\n"
 	# get repos info
-	mosdns_version=`curl -sk https://api.github.com/repos/sbwml/luci-app-mosdns/releases | grep "tag_name" | grep v5 | head -n 1 | awk -F ":" '{print $2}' | sed 's/\"//g;s/,//;s/ //'`
-	curl -sk --connect-timeout 10 "https://api.github.com/repos/sbwml/luci-app-mosdns/releases" | grep "browser_download_url" | grep "$mosdns_version" > $TMPDIR/releases.txt
+	mosdns_version=`curl -sk https://api.github.com/repos/abbaccadd0/luci-app-mosdns/releases | grep "tag_name" | grep v5 | head -n 1 | awk -F ":" '{print $2}' | sed 's/\"//g;s/,//;s/ //'`
+	curl -sk --connect-timeout 10 "https://api.github.com/repos/abbaccadd0/luci-app-mosdns/releases" | grep "browser_download_url" | grep "$mosdns_version" > $TMPDIR/releases.txt
 	if [ $? -ne 0 ]; then
 		echo -e "${RED_COLOR}Failed to get version information, Please check the network status.${RES}"
 		rm -rf $TMPDIR

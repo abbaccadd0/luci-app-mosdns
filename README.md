@@ -2,6 +2,17 @@
 
 [MosDNS](https://github.com/IrineSistiana/mosdns) is a plug-in DNS forwarder. Users can splicing plug-ins as needed to customize their own DNS processing logic.
 
+## luci-app-mosdns for abbaccadd0
+
+为个人使用方便而fork的luci-app-mosdns，主要是可以用Github Action编译ipk出来，毕竟编译进固件对我的路由器和我本人来说有点复杂
+
+另外将路由器容量检测由40MB降低到了5MB
+
+- 仅适用于本仓库的安装脚本执行命令
+  ```shell
+  sh -c "$(curl -ksS https://raw.githubusercontent.com/abbaccadd0/luci-app-mosdns/v5/install.sh)"
+  ```
+
 ## DNS protocol standard
 
 **General DNS (UDP):** `119.29.29.29` **&** `udp://119.29.29.29:53`
