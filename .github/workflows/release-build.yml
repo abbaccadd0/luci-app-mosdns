@@ -48,7 +48,7 @@ jobs:
           fetch-depth: 0
 
       - name: Delete all releases
-        uses: sgpublic/delete-release-action@main
+        uses: sgpublic/delete-release-action@v1.1
         with:
           release-drop: true
           release-keep-count: -1
