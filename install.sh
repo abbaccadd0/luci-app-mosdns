@@ -116,7 +116,7 @@ INSTALL() (
 	opkg install --force-overwrite $TMPDIR/geosite.ipk
 	opkg install $TMPDIR/v2dat_$platform.ipk
 	opkg install $TMPDIR/mosdns_$platform.ipk
-	opkg install $TMPDIR/luci-app-mosdns.ipk
+	opkg install --force-overwrite $TMPDIR/luci-app-mosdns.ipk
 	opkg install $TMPDIR/luci-i18n-mosdns-zh-cn.ipk
 	rm -rf $TMPDIR /tmp/luci-*
 	echo -e "${GREEN_COLOR}Done!${RES}"
