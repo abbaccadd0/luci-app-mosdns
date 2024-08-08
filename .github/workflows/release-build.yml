@@ -47,6 +47,20 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Delete all releases
+        uses: sgpublic/delete-release-action@main
+        with:
+          release-drop: true
+          release-keep-count: -1
+          release-drop-tag: true
+          pre-release-drop: true
+          pre-release-keep-count: -1
+          pre-release-drop-tag: true
+          draft-drop: true
+          draft-drop-count: -1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+
       - name: Get v2ray-geodata
         run: |
           git clone https://github.com/sbwml/v2ray-geodata
