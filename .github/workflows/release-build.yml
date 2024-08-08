@@ -66,9 +66,11 @@ jobs:
           path: bin/packages/${{ matrix.arch }}/packages_ci/*.ipk
 
       - name: Upload packages
-        uses: ncipollo/release-action@v1
+        uses: ncipollo/release-action@v1.14.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           allowUpdates: true
           replacesArtifacts: true
+          tag: v5.3.1
+          commit: v5
           artifacts: "bin/packages/${{ matrix.arch }}/packages_ci/*.ipk"
