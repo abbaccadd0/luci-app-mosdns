@@ -38,21 +38,17 @@ function renderStatus(isRunning) {
 
 async function loadCodeMirrorResources() {
 	const styles = [
-		'/luci-static/resources/codemirror5/codemirror.min.css',
-		'/luci-static/resources/codemirror5/addon/fold/foldgutter.min.css',
-		'/luci-static/resources/codemirror5/addon/lint/lint.min.css',
 		'/luci-static/resources/codemirror5/theme/dracula.min.css',
+		'/luci-static/resources/codemirror5/addon/lint/lint.min.css',
+		'/luci-static/resources/codemirror5/codemirror.min.css',
 	];
 	const scripts = [
+		'/luci-static/resources/codemirror5/libs/js-yaml.min.js',
 		'/luci-static/resources/codemirror5/codemirror.min.js',
 		'/luci-static/resources/codemirror5/addon/display/autorefresh.min.js',
-		'/luci-static/resources/codemirror5/addon/fold/foldcode.min.js',
-		'/luci-static/resources/codemirror5/addon/fold/foldgutter.min.js',
-		'/luci-static/resources/codemirror5/addon/fold/indent-fold.min.js',
+		'/luci-static/resources/codemirror5/mode/yaml/yaml.min.js',
 		'/luci-static/resources/codemirror5/addon/lint/lint.min.js',
 		'/luci-static/resources/codemirror5/addon/lint/yaml-lint.min.js',
-		'/luci-static/resources/codemirror5/libs/js-yaml.min.js',
-		'/luci-static/resources/codemirror5/mode/yaml/yaml.min.js',
 	];
 	const loadStyles = async () => {
 		for (const href of styles) {
@@ -227,7 +223,7 @@ return view.extend({
 		o.default = 'tls://8.8.8.8';
 		o.depends('custom_stream_media_dns', '1');
 
-		o = s.taboption('basic', form.ListValue, 'bootstrap_dns', _('Bootstrap DNS servers'),
+		o = s.taboption('basic', form.Value, 'bootstrap_dns', _('Bootstrap DNS servers'),
 			_('Bootstrap DNS servers are used to resolve IP addresses of the DoH/DoT resolvers you specify as upstreams'));
 		o.value('119.29.29.29', _('Tencent Public DNS (119.29.29.29)'));
 		o.value('119.28.28.28', _('Tencent Public DNS (119.28.28.28)'));
@@ -289,8 +285,7 @@ return view.extend({
 		o.default = false;
 		o.depends('configfile', '/var/etc/mosdns.json');
 
-		o = s.taboption('advanced', form.Value, 'cache_size', _('DNS Cache Size'),
-			_('DNS cache size (in piece). To disable caching, please set to 0.'));
+		o = s.taboption('advanced', form.Value, 'cache_size', _('DNS Cache Size'));
 		o.datatype = 'and(uinteger,min(0))';
 		o.default = 8000;
 		o.depends('cache', '1');
@@ -400,13 +395,10 @@ return view.extend({
 					matchBrackets: true,
 					mode: "text/yaml",
 					styleActiveLine: true,
-					theme: "dracula",
-					fontSize: "14",
-					viewportMargin: Infinity
+					theme: "dracula"
 				});
-				console.log('CodeMirror editor initialized.');
 			}
-		}, 120);
+		}, 600);
 		o = s.taboption('basic', form.TextValue, '_custom', _('Configuration Editor'),
 			_('This is the content of the file \'/etc/mosdns/config_custom.yaml\' from which your MosDNS configuration will be generated. \
 			Only accepts configuration content in yaml format.'));
@@ -419,15 +411,14 @@ return view.extend({
 			if (configeditor) {
 				var editorContent = configeditor.getValue();
 				if (editorContent === formvalue) {
-					return;
+					return window.location.reload();
 				}
 				return fs.write('/etc/mosdns/config_custom.yaml', editorContent.trim().replace(/\r\n/g, '\n') + '\n')
 					.then(function (i) {
-						ui.addNotification(null, E('p', _('Configuration have been saved.')), 'info');
 						return fs.exec('/etc/init.d/mosdns', ['restart']);
 					})
 					.then(function () {
-						window.location.reload();
+						return window.location.reload();
 					})
 					.catch(function (e) {
 						ui.addNotification(null, E('p', _('Unable to save contents: %s').format(e.message)));
