@@ -2,6 +2,17 @@
 
 [MosDNS](https://github.com/IrineSistiana/mosdns) is a plug-in DNS forwarder. Users can splicing plug-ins as needed to customize their own DNS processing logic.
 
+## luci-app-mosdns for abbaccadd0
+
+为个人使用方便而fork的luci-app-mosdns，主要是可以用Github Action编译ipk出来，毕竟编译进固件对我的路由器和我本人来说有点复杂
+
+另外将路由器容量检测由40MB降低到了5MB
+
+- 仅适用于本仓库的安装脚本执行命令
+  ```shell
+  sh -c "$(curl -ksS https://raw.githubusercontent.com/abbaccadd0/luci-app-mosdns/v5/install.sh)"
+  ```
+
 ## DNS protocol standard
 
 **General DNS (UDP):** `119.29.29.29` **&** `udp://119.29.29.29:53`
@@ -24,10 +35,10 @@
 
 - Openwrt official SnapShots
 
-  * requires golang 1.24.x or latest version
+  * requires golang 1.22.x or latest version
   ```shell
   rm -rf feeds/packages/lang/golang
-  git clone https://github.com/sbwml/packages_lang_golang -b 24.x feeds/packages/lang/golang
+  git clone https://github.com/sbwml/packages_lang_golang -b 23.x feeds/packages/lang/golang
   ```
 
   ```shell
@@ -61,13 +72,8 @@
 
 - Install `curl` package
   ```shell
-  # for opkg package manager (openwrt 21.02 ~ 24.10)
   opkg update
   opkg install curl
-  
-  # for apk package manager
-  apk update
-  apk add curl
   ```
 
 - Execute install script (Multi-architecture support)
@@ -75,11 +81,14 @@
   sh -c "$(curl -ksS https://raw.githubusercontent.com/sbwml/luci-app-mosdns/v5/install.sh)"
   ```
 
-  install via ghproxy:
-  ```shell
-  sh -c "$(curl -ksS https://raw.githubusercontent.com/sbwml/luci-app-mosdns/v5/install.sh)" _ gh_proxy="https://gh.cooluc.com"
-  ```
-
 --------------
 
-![1](https://github.com/user-attachments/assets/f92847c9-4512-4969-afdc-2d83ddf3a758)
+## Preview Images
+
+![1](https://github.com/sbwml/luci-app-mosdns/assets/16485166/3118d6eb-cc47-4411-8fd7-f84fe60b84ed)
+
+![2](https://github.com/sbwml/luci-app-mosdns/assets/16485166/a23da446-7751-4944-a2d0-56049142729c)
+
+![3](https://github.com/sbwml/luci-app-mosdns/assets/16485166/941d2bc9-5e12-42bf-980e-3faebe83e6e8)
+
+![4](https://github.com/sbwml/luci-app-mosdns/assets/16485166/aaefee1f-6396-4b99-badf-86fe1a49cf4b)
