@@ -1,10 +1,7 @@
-name: Build
+name: Build Packages
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - 'v*'
 
 jobs:
   build:
@@ -48,32 +45,12 @@ jobs:
           - x86_64
         sdk:
           - openwrt-24.10
-          # - SNAPSHOT
+          - SNAPSHOT
 
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Delete all releases
-        uses: sgpublic/delete-release-action@v1.1
-        with:
-          release-drop: true
-          release-keep-count: -1
-          release-drop-tag: true
-          pre-release-drop: true
-          pre-release-keep-count: -1
-          pre-release-drop-tag: true
-          draft-drop: true
-          draft-drop-count: -1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Get latest release version from another repository
-        id: get_latest_release
-        run: |
-          latest_release=$(curl -s https://api.github.com/repos/sbwml/luci-app-mosdns/releases/latest | jq -r .tag_name)
-          echo "::set-output name=latest_release::$latest_release"
 
       - name: Build with Static Linking
         run: |
@@ -101,19 +78,35 @@ jobs:
             bin/packages/riscv64_generic/packages_ci/*.apk
             bin/packages/${{ matrix.arch }}/packages_ci/*.ipk
 
-      - name: Upload v2ray-geoip package
-        if: matrix.arch == 'aarch64_cortex-a72'
-        uses: actions/upload-artifact@v4
-        with:
-          name: v2ray-geoip
-          path: path/to/v2ray-geoip/package
+      - name: Create compress files
+        continue-on-error: true
+        run: |
+          if [ "${{ matrix.arch }}" = "riscv64_riscv64" ] && [ "${{ matrix.sdk }}" = "SNAPSHOT" ]; then
+            tar -zcvf ${{ matrix.sdk }}-${{ matrix.arch }}.tar.gz -C bin/packages/riscv64_generic/ packages_ci
+          else
+            tar -zcvf ${{ matrix.sdk }}-${{ matrix.arch }}.tar.gz -C bin/packages/${{ matrix.arch }}/ packages_ci
 
-      - name: Upload packages
-        uses: ncipollo/release-action@v1.14.0
+      - name: Get latest release tag from external repo
+        id: get_tag
+        run: |
+          LATEST_TAG=$(curl -s https://api.github.com/repos/sbwml/luci-app-mosdns/releases/latest | jq -r .tag_name)
+          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
+
+      - name: Delete all existing releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RELEASES=$(gh release list --limit 100 --json name | jq -r '.[].name')
+          for RELEASE in $RELEASES; do
+            gh release delete "$RELEASE" --yes
+          done
+
+      - name: Upload packages to new release
+        uses: ncipollo/release-action@v1
         with:
+          name: ${{ env.LATEST_TAG }}
           token: ${{ secrets.GITHUB_TOKEN }}
           allowUpdates: true
           replacesArtifacts: true
-          tag: ${{ steps.get_latest_release.outputs.latest_release }}
-          commit: v5
-          artifacts: "bin/packages/${{ matrix.arch }}/packages_ci/*.ipk"
+          prerelease: false
+          artifacts: "${{ matrix.sdk }}-${{ matrix.arch }}.tar.gz"
