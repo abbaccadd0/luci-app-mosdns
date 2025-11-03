@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Build ${{ matrix.arch }}
+    name: Build ${{ matrix.arch }}-${{ matrix.sdk }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -31,7 +31,6 @@ jobs:
           - arm_cortex-a9_vfpv3-d16
           - arm_fa526
           - arm_xscale
-          - armeb_xscale
           - i386_pentium-mmx
           - i386_pentium4
           - loongarch64_generic
@@ -47,6 +46,9 @@ jobs:
           - mipsel_mips32
           - riscv64_riscv64
           - x86_64
+        sdk:
+          - openwrt-24.10
+          # - SNAPSHOT
 
     steps:
       - uses: actions/checkout@main
@@ -73,14 +75,19 @@ jobs:
           latest_release=$(curl -s https://api.github.com/repos/sbwml/luci-app-mosdns/releases/latest | jq -r .tag_name)
           echo "::set-output name=latest_release::$latest_release"
 
+      - name: Build with Static Linking
+        run: |
+          sed -i '/golang-package/a \\tGO_PKG_DEFAULT_LDFLAGS:=-w -s -extldflags "-static"' mosdns/Makefile
+          sed -i '/golang-package/a \\tGO_PKG_DEFAULT_LDFLAGS:=-w -s -extldflags "-static"' v2dat/Makefile
+
       - name: Get v2ray-geodata
         run: |
           git clone https://github.com/sbwml/v2ray-geodata
 
-      - name: Building packages
-        uses: sbwml/openwrt-gh-action-sdk@go1.24
+      - name: Build Packages
+        uses: sbwml/openwrt-gh-action-sdk@go1.25
         env:
-          ARCH: ${{ matrix.arch }}-openwrt-24.10
+          ARCH: ${{ matrix.arch }}-${{ matrix.sdk }}
           FEEDNAME: packages_ci
           PACKAGES: luci-app-mosdns
           NO_REFRESH_CHECK: true
@@ -88,8 +95,11 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.arch }}
-          path: bin/packages/${{ matrix.arch }}/packages_ci/*.ipk
+          name: ${{ matrix.arch }}-${{ matrix.sdk }}
+          path: |
+            bin/packages/${{ matrix.arch }}/packages_ci/*.apk
+            bin/packages/riscv64_generic/packages_ci/*.apk
+            bin/packages/${{ matrix.arch }}/packages_ci/*.ipk
 
       - name: Upload v2ray-geoip package
         if: matrix.arch == 'aarch64_cortex-a72'
