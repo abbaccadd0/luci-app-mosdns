@@ -99,7 +99,6 @@ jobs:
           RELEASES=$(gh release list --limit 100 --json name | jq -r '.[].name')
           for RELEASE in $RELEASES; do
             gh release delete "$RELEASE" --yes
-          done
 
       - name: Upload packages to new release
         uses: ncipollo/release-action@v1
