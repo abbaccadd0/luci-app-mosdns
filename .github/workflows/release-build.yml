@@ -106,6 +106,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           name: ${{ env.LATEST_TAG }}
+          tag: ${{ env.LATEST_TAG }}
           token: ${{ secrets.GITHUB_TOKEN }}
           allowUpdates: true
           replacesArtifacts: true
