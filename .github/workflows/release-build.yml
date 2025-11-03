@@ -86,10 +86,11 @@ jobs:
           else
             tar -zcvf ${{ matrix.sdk }}-${{ matrix.arch }}.tar.gz -C bin/packages/${{ matrix.arch }}/ packages_ci
 
-      - name: Get latest release tag from external repo
+      - name: Get latest release tag from public repo
         id: get_tag
         run: |
-          LATEST_TAG=$(curl -s https://api.github.com/repos/sbwml/luci-app-mosdns/releases/latest | jq -r .tag_name)
+          PUBLIC_REPO="sbwml/luci-app-mosdns"
+          LATEST_TAG=$(curl -s https://api.github.com/repos/${PUBLIC_REPO}/releases/latest | jq -r .tag_name)
           echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
 
       - name: Delete all existing releases
