@@ -52,15 +52,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      # - name: Delete all existing releases
-      #   env:
-      #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   run: |
-      #     RELEASES=$(gh release list --limit 100 --json name | jq -r '.[].name')
-      #     for RELEASE in $RELEASES; do
-      #       gh release delete "$RELEASE" --yes
-      #     done
-
       - name: Build with Static Linking
         run: |
           sed -i '/golang-package/a \\tGO_PKG_DEFAULT_LDFLAGS:=-w -s -extldflags "-static"' mosdns/Makefile
@@ -94,6 +85,7 @@ jobs:
             tar -zcvf ${{ matrix.sdk }}-${{ matrix.arch }}.tar.gz -C bin/packages/riscv64_generic/ packages_ci
           else
             tar -zcvf ${{ matrix.sdk }}-${{ matrix.arch }}.tar.gz -C bin/packages/${{ matrix.arch }}/ packages_ci
+          fi
 
       - name: Get latest release tag from public repo
         id: get_tag
