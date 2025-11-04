@@ -52,6 +52,15 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Delete all existing releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RELEASES=$(gh release list --limit 100 --json name | jq -r '.[].name')
+          for RELEASE in $RELEASES; do
+            gh release delete "$RELEASE" --yes
+          done
+
       - name: Build with Static Linking
         run: |
           sed -i '/golang-package/a \\tGO_PKG_DEFAULT_LDFLAGS:=-w -s -extldflags "-static"' mosdns/Makefile
@@ -92,15 +101,6 @@ jobs:
           PUBLIC_REPO="sbwml/luci-app-mosdns"
           LATEST_TAG=$(curl -s https://api.github.com/repos/${PUBLIC_REPO}/releases/latest | jq -r .tag_name)
           echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
-
-      - name: Delete all existing releases
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          RELEASES=$(gh release list --limit 100 --json name | jq -r '.[].name')
-          for RELEASE in $RELEASES; do
-            gh release delete "$RELEASE" --yes
-          done
 
       - name: Upload packages to new release
         uses: ncipollo/release-action@v1
