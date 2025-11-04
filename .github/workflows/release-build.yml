@@ -28,21 +28,21 @@ jobs:
           - arm_cortex-a9_vfpv3-d16
           - arm_fa526
           - arm_xscale
-          - i386_pentium-mmx
-          - i386_pentium4
-          - loongarch64_generic
-          - mips64_mips64r2
-          - mips64_octeonplus
-          - mips64el_mips64r2
-          - mips_24kc
-          - mips_4kec
-          - mips_mips32
-          - mipsel_24kc
-          - mipsel_24kc_24kf
-          - mipsel_74kc
-          - mipsel_mips32
-          - riscv64_riscv64
-          - x86_64
+          # - i386_pentium-mmx
+          # - i386_pentium4
+          # - loongarch64_generic
+          # - mips64_mips64r2
+          # - mips64_octeonplus
+          # - mips64el_mips64r2
+          # - mips_24kc
+          # - mips_4kec
+          # - mips_mips32
+          # - mipsel_24kc
+          # - mipsel_24kc_24kf
+          # - mipsel_74kc
+          # - mipsel_mips32
+          # - riscv64_riscv64
+          # - x86_64
         sdk:
           - openwrt-24.10
           - SNAPSHOT
@@ -52,14 +52,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Delete all existing releases
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          RELEASES=$(gh release list --limit 100 --json name | jq -r '.[].name')
-          for RELEASE in $RELEASES; do
-            gh release delete "$RELEASE" --yes
-          done
+      # - name: Delete all existing releases
+      #   env:
+      #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   run: |
+      #     RELEASES=$(gh release list --limit 100 --json name | jq -r '.[].name')
+      #     for RELEASE in $RELEASES; do
+      #       gh release delete "$RELEASE" --yes
+      #     done
 
       - name: Build with Static Linking
         run: |
